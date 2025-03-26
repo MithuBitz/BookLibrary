@@ -7,8 +7,48 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <h1>Book Library</h1>
-    <div></div>
+    <div>
+      <h1>Book Library</h1>
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search..." />
+        <button>Search</button>
+      </div>
+      <div class="list-grid-container">
+        <label id="list-label">
+          <input id="list-input" type="checkbox" name="list" />
+          <img
+            style="width: 30px; height: 30px"
+            src="./assets/list.png"
+            alt="list"
+          />
+          <p>List</p>
+        </label>
+        <label id="grid-label">
+          <input id="grid-input" type="checkbox" name="grid" />
+          <img
+            style="width: 30px; height: 30px"
+            src="./assets/grid.png"
+            alt="Grid"
+          />
+          <p>Grid</p>
+        </label>
+      </div>
+
+      <h2>No Book Found</h2>
+
+      <!-- <ul>
+        <li>
+          <h1>Book Name</h1>
+          <img  style="width: 150px; height: 150px" src="./assets/grid.png" alt="Book image"/>
+        </li>
+        <li>
+          <h1>Book Name</h1>
+          <img  style="width: 150px; height: 150px" src="./assets/grid.png" alt="Book image"/>
+          <p>Author</p>
+          <h3>Price</h3>
+        </li>
+      </ul> -->
+    </div>
     <script src="script.js"></script>
   </body>
 </html>

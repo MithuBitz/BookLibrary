@@ -1,3 +1,6 @@
+const listInputElement = document.getElementById("list-input");
+const gridInputElement = document.getElementById("grid-input");
+
 //Function to get the books from api
 const getFetchData = async () => {
   const url =
@@ -30,6 +33,24 @@ const getBookData = async () => {
   }
 };
 
+//When user select list
+listInputElement.addEventListener("click", () => {
+  if (listInputElement.checked) {
+    gridInputElement.checked = false;
+    console.log("List view");
+  }
+});
 
-getBookData();
-// console.log(bookData);
+//When user select grid
+gridInputElement.addEventListener("click", () => {
+  if (gridInputElement.checked) {
+    listInputElement.checked = false;
+    console.log("Grid view");
+  }
+});
+
+
+// Function to display a books in List
+const displayBookList = () => {
+  
+};
