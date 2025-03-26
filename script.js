@@ -1,6 +1,9 @@
 const listInputElement = document.getElementById("list-input");
 const gridInputElement = document.getElementById("grid-input");
 
+const gridForBooksElement = document.getElementById("book-grid-container");
+const listForBooksElement = document.getElementById("book-list-container");
+
 //Function to get the books from api
 const getFetchData = async () => {
   const url =
@@ -38,6 +41,8 @@ listInputElement.addEventListener("click", () => {
   if (listInputElement.checked) {
     gridInputElement.checked = false;
     console.log("List view");
+    listForBooksElement.classList.remove("hide");
+    gridForBooksElement.classList.add("hide");
   }
 });
 
@@ -46,11 +51,10 @@ gridInputElement.addEventListener("click", () => {
   if (gridInputElement.checked) {
     listInputElement.checked = false;
     console.log("Grid view");
+    listForBooksElement.classList.add("hide");
+    gridForBooksElement.classList.remove("hide");
   }
 });
 
-
 // Function to display a books in List
-const displayBookList = () => {
-  
-};
+const displayBookList = () => {};

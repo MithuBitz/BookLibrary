@@ -4,6 +4,16 @@
   box-sizing: border-box;
 }
 
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.hide {
+  display: none;
+}
+
 .search-container {
   display: flex;
   justify-content: center;
