@@ -61,6 +61,7 @@ gridInputElement.addEventListener("click", () => {
     // console.log("Grid view");
     listForBooksElement.classList.add("hide");
     gridForBooksElement.classList.remove("hide");
+    displayBookGrid();
   }
 });
 
@@ -75,14 +76,38 @@ const displayBookList = async () => {
     const bookImg = document.createElement("img");
     bookImg.src = imgLink;
     const div = document.createElement("div");
-    const h3 = document.createElement("h3");
-    h3.textContent = book.volumeInfo.title;
+    const h4 = document.createElement("h4");
+    h4.textContent = book.volumeInfo.title;
+    h4.classList.add("book-name-text");
     const p = document.createElement("p");
     p.textContent = book.volumeInfo.authors[0];
-    div.append(h3, p);
+    div.append(h4, p);
     li.appendChild(bookImg);
     li.appendChild(div);
     li.classList.add("li-style");
     bookListUlElement.appendChild(li);
+  });
+};
+
+// Function to display a books in Grid
+
+const displayBookGrid = async () => {
+  const { data } = await getBookData();
+  console.log(data);
+
+  data.map((book) => {
+    const div = document.createElement("div");
+    const bookImg = document.createElement("img");
+    bookImg.src = book.volumeInfo.imageLinks.thumbnail;
+    const h4 = document.createElement("h4");
+    h4.textContent = book.volumeInfo.title;
+    h4.classList.add("book-name-text");
+    const p = document.createElement("p");
+    p.textContent = book.volumeInfo.authors[0];
+    div.append(bookImg, h4, p);
+    div.classList.add("grid-items");
+    gridForBooksElement.appendChild(div);
+    gridForBooksElement.classList.remove("hide");
+    gridForBooksElement.classList.add("books-grid");
   });
 };
