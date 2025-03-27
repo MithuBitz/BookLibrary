@@ -76,3 +76,12 @@ button:hover {
   font-size: 30;
   font-weight: bold;
 }
+
+.li-style {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 10px;
+  background-color: #31727a;
+  border-radius: 12px;
+}
