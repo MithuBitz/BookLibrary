@@ -161,3 +161,19 @@ const clearBookList = () => {
 const clearBookGrid = () => {
   gridForBooksElement.innerHTML = "";
 };
+
+// Function to render the page at reload
+// with list view and accending order
+const firstRender = async () => {
+  listInputElement.checked = true;
+  gridInputElement.checked = false;
+  listForBooksElement.classList.remove("hide");
+  gridForBooksElement.classList.add("hide");
+
+  const { data } = await getBookData();
+  const sortedBooks = sortBooks(data, "asc");
+  displayBookList(sortedBooks);
+};
+
+// Call the firstRender on page load
+firstRender();
