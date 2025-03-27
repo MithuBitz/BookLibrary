@@ -36,12 +36,18 @@
 
       <h2 id="no-book-found" class="hide">No Book Found</h2>
 
+      <div class="sort-option">
+        <label for="sortOrder">Sort by Name:</label>
+        <select id="sortOrderName">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
+
       <div id="book-list-container">
         <ul id="book-list-ul"></ul>
       </div>
-      <div id="book-grid-container" class="hide">
-        
-      </div>
+      <div id="book-grid-container" class="hide"></div>
     </div>
     <script src="script.js"></script>
   </body>

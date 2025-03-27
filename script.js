@@ -6,6 +6,8 @@ const listForBooksElement = document.getElementById("book-list-container");
 
 const bookListUlElement = document.getElementById("book-list-ul");
 
+const sortingDropdown = document.getElementById("sortOrderName");
+
 //Function to get the books from api
 const getFetchData = async () => {
   const url =
@@ -38,50 +40,35 @@ const getBookData = async () => {
   }
 };
 
-//When user select list
-listInputElement.addEventListener("click", async () => {
-  if (listInputElement.checked) {
-    gridInputElement.checked = false;
-    // console.log("List view");
-    listForBooksElement.classList.remove("hide");
-    gridForBooksElement.classList.add("hide");
-    const { data } = await getBookData();
-    console.log(data);
-    if (data.length < 0) {
-      document.getElementById("no-book-found").classList.remove("hide");
-    }
-    displayBookList();
-  }
-});
-
-//When user select grid
-gridInputElement.addEventListener("click", () => {
-  if (gridInputElement.checked) {
-    listInputElement.checked = false;
-    // console.log("Grid view");
-    listForBooksElement.classList.add("hide");
-    gridForBooksElement.classList.remove("hide");
-    displayBookGrid();
-  }
-});
+// //When user select grid
+// gridInputElement.addEventListener("click", () => {
+//   if (gridInputElement.checked) {
+//     listInputElement.checked = false;
+//     // console.log("Grid view");
+//     listForBooksElement.classList.add("hide");
+//     gridForBooksElement.classList.remove("hide");
+//     displayBookGrid();
+//   }
+// });
 
 // Function to display a books in List
-const displayBookList = async () => {
-  const { data } = await getBookData();
-  // console.log(data);
-  data.map((book) => {
+const displayBookList = (books) => {
+  clearBookList();
+  books.map((book) => {
     const li = document.createElement("li");
     const imgLink = book.volumeInfo.imageLinks.thumbnail;
     // console.log(book.volumeInfo.imageLinks.thumbnail);
     const bookImg = document.createElement("img");
     bookImg.src = imgLink;
     const div = document.createElement("div");
-    const h4 = document.createElement("h4");
-    h4.textContent = book.volumeInfo.title;
-    h4.classList.add("book-name-text");
+    const h2 = document.createElement("h2");
+    h2.textContent = book.volumeInfo.title;
+    h2.classList.add("book-name-text");
     const p = document.createElement("p");
-    p.textContent = book.volumeInfo.authors[0];
-    div.append(h4, p);
+    p.textContent = ` Author : ${book.volumeInfo.authors[0]}`;
+    p.classList.add("author-text");
+    // h3.textContent =
+    div.append(h2, p);
     li.appendChild(bookImg);
     li.appendChild(div);
     li.classList.add("li-style");
@@ -91,11 +78,9 @@ const displayBookList = async () => {
 
 // Function to display a books in Grid
 
-const displayBookGrid = async () => {
-  const { data } = await getBookData();
-  console.log(data);
-
-  data.map((book) => {
+const displayBookGrid = (books) => {
+  clearBookGrid();
+  books.map((book) => {
     const div = document.createElement("div");
     const bookImg = document.createElement("img");
     bookImg.src = book.volumeInfo.imageLinks.thumbnail;
@@ -103,11 +88,76 @@ const displayBookGrid = async () => {
     h4.textContent = book.volumeInfo.title;
     h4.classList.add("book-name-text");
     const p = document.createElement("p");
-    p.textContent = book.volumeInfo.authors[0];
+    p.textContent = ` Author : ${book.volumeInfo.authors[0]}`;
+    p.classList.add("author-text");
     div.append(bookImg, h4, p);
     div.classList.add("grid-items");
     gridForBooksElement.appendChild(div);
-    gridForBooksElement.classList.remove("hide");
-    gridForBooksElement.classList.add("books-grid");
   });
+  gridForBooksElement.classList.remove("hide");
+  gridForBooksElement.classList.add("books-grid");
+};
+
+const sortBooks = (books, order) => {
+  return books.sort((a, b) => {
+    const titleA = a.volumeInfo.title.toUpperCase();
+    const titleB = b.volumeInfo.title.toUpperCase();
+    return order === "asc"
+      ? titleA.localeCompare(titleB)
+      : titleB.localeCompare(titleA);
+  });
+};
+
+sortingDropdown.addEventListener("change", async () => {
+  const selectedValue = sortingDropdown.value;
+  const { data } = await getBookData();
+
+  const sortedBooks = sortBooks(data, selectedValue);
+  console.log(sortedBooks);
+
+  if (listInputElement.checked) {
+    displayBookList(sortedBooks);
+  } else {
+    displayBookGrid(sortedBooks);
+  }
+});
+
+//When user select list
+listInputElement.addEventListener("click", async () => {
+  if (listInputElement.checked) {
+    gridInputElement.checked = false;
+    // console.log("List view");
+    listForBooksElement.classList.remove("hide");
+    gridForBooksElement.classList.add("hide");
+    const { data } = await getBookData();
+    // console.log(data);
+    if (data.length < 0) {
+      document.getElementById("no-book-found").classList.remove("hide");
+    }
+    displayBookList(data);
+  }
+});
+
+gridInputElement.addEventListener("click", async () => {
+  if (gridInputElement.checked) {
+    listInputElement.checked = false;
+    // console.log("Grid view");
+    listForBooksElement.classList.add("hide");
+    gridForBooksElement.classList.remove("hide");
+    const { data } = await getBookData();
+    // console.log(data);
+    if (data.length < 0) {
+      document.getElementById("no-book-found").classList.remove("hide");
+    }
+    displayBookList(data);
+  }
+});
+
+const clearBookList = () => {
+  bookListUlElement.innerHTML = "";
+};
+
+// Clear grid before loading new books
+const clearBookGrid = () => {
+  gridForBooksElement.innerHTML = "";
 };
