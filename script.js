@@ -6,7 +6,13 @@ const listForBooksElement = document.getElementById("book-list-container");
 
 const bookListUlElement = document.getElementById("book-list-ul");
 
-const sortingDropdown = document.getElementById("sortOrderName");
+const sortingDropdownName = document.getElementById("sortOrderName");
+const soriingDropdownDate = document.getElementById("sortOrderDate");
+
+const searchBookElement = document.getElementById("searchInput");
+
+//Store all books globally in an array
+let allBooks = [];
 
 //Function to get the books from api
 const getFetchData = async () => {
@@ -67,11 +73,29 @@ const displayBookList = (books) => {
     const p = document.createElement("p");
     p.textContent = ` Author : ${book.volumeInfo.authors[0]}`;
     p.classList.add("author-text");
+
+    const p2 = document.createElement("p");
+    p2.textContent = ` Publishers : ${book.volumeInfo.publisher}`;
+    p2.classList.add("author-text");
+
+    const p3 = document.createElement("p");
+    p3.textContent = ` Published Date : ${book.volumeInfo.publishedDate}`;
+    p3.classList.add("author-text");
     // h3.textContent =
-    div.append(h2, p);
+    div.append(h2, p, p2, p3);
     li.appendChild(bookImg);
     li.appendChild(div);
     li.classList.add("li-style");
+    // Implement Clicking on a book item, should open more details in a new tab (using infoLink)
+    li.addEventListener("click", () => {
+      const link = book.volumeInfo.infoLink;
+      if (link) {
+        window.open(link, "_blank");
+      } else {
+        alert("No details available for this book");
+      }
+    });
+
     bookListUlElement.appendChild(li);
   });
 };
@@ -90,15 +114,34 @@ const displayBookGrid = (books) => {
     const p = document.createElement("p");
     p.textContent = ` Author : ${book.volumeInfo.authors[0]}`;
     p.classList.add("author-text");
-    div.append(bookImg, h4, p);
+    const p2 = document.createElement("p");
+    p2.textContent = ` Publishers : ${book.volumeInfo.publisher}`;
+    p2.classList.add("author-text");
+
+    const p3 = document.createElement("p");
+    p3.textContent = ` Published Date : ${book.volumeInfo.publishedDate}`;
+    p3.classList.add("author-text");
+    div.append(bookImg, h4, p, p2, p3);
     div.classList.add("grid-items");
+
+    // Implement Clicking on a book item, should open more details in a new tab (using infoLink)
+    div.addEventListener("click", () => {
+      const link = book.volumeInfo.infoLink;
+      if (link) {
+        window.open(link, "_blank");
+      } else {
+        alert("No details available for this book");
+      }
+    });
+
     gridForBooksElement.appendChild(div);
   });
   gridForBooksElement.classList.remove("hide");
   gridForBooksElement.classList.add("books-grid");
 };
 
-const sortBooks = (books, order) => {
+//Sort book by its title
+const sortBooksByTitle = (books, order) => {
   return books.sort((a, b) => {
     const titleA = a.volumeInfo.title.toUpperCase();
     const titleB = b.volumeInfo.title.toUpperCase();
@@ -108,11 +151,35 @@ const sortBooks = (books, order) => {
   });
 };
 
-sortingDropdown.addEventListener("change", async () => {
-  const selectedValue = sortingDropdown.value;
-  const { data } = await getBookData();
+//Sort book by its date of release
+const sortBooksByDate = (books, order) => {
+  return books.sort((a, b) => {
+    const publishedDateA = new Date(a.volumeInfo.publishedDate);
+    const publishedDateB = new Date(b.volumeInfo.publishedDate);
+    // console.log(publishedDateA - publishedDateB);
+    return order === "asc"
+      ? publishedDateA - publishedDateB
+      : publishedDateB - publishedDateA;
+  });
+};
 
-  const sortedBooks = sortBooks(data, selectedValue);
+sortingDropdownName.addEventListener("change", async () => {
+  const selectedValue = sortingDropdownName.value;
+
+  const sortedBooks = sortBooksByTitle(allBooks, selectedValue);
+  console.log(sortedBooks);
+
+  if (listInputElement.checked) {
+    displayBookList(sortedBooks);
+  } else {
+    displayBookGrid(sortedBooks);
+  }
+});
+
+soriingDropdownDate.addEventListener("change", async () => {
+  const selectedValue = soriingDropdownDate.value;
+
+  const sortedBooks = sortBooksByDate(allBooks, selectedValue);
   console.log(sortedBooks);
 
   if (listInputElement.checked) {
@@ -123,33 +190,28 @@ sortingDropdown.addEventListener("change", async () => {
 });
 
 //When user select list
-listInputElement.addEventListener("click", async () => {
+listInputElement.addEventListener("click", () => {
   if (listInputElement.checked) {
     gridInputElement.checked = false;
     // console.log("List view");
     listForBooksElement.classList.remove("hide");
     gridForBooksElement.classList.add("hide");
-    const { data } = await getBookData();
+
     // console.log(data);
-    if (data.length < 0) {
-      document.getElementById("no-book-found").classList.remove("hide");
-    }
-    displayBookList(data);
+    displayBookList(allBooks);
   }
 });
 
-gridInputElement.addEventListener("click", async () => {
+gridInputElement.addEventListener("click", () => {
   if (gridInputElement.checked) {
     listInputElement.checked = false;
     // console.log("Grid view");
     listForBooksElement.classList.add("hide");
     gridForBooksElement.classList.remove("hide");
-    const { data } = await getBookData();
+
     // console.log(data);
-    if (data.length < 0) {
-      document.getElementById("no-book-found").classList.remove("hide");
-    }
-    displayBookList(data);
+
+    displayBookList(allBooks);
   }
 });
 
@@ -171,9 +233,28 @@ const firstRender = async () => {
   gridForBooksElement.classList.add("hide");
 
   const { data } = await getBookData();
-  const sortedBooks = sortBooks(data, "asc");
-  displayBookList(sortedBooks);
+  allBooks = sortBooksByTitle(data, "asc");
+  if (allBooks.length < 0) {
+    document.getElementById("no-book-found").classList.remove("hide");
+  }
+  displayBookList(allBooks);
 };
+
+// Implement search functionality
+searchBookElement.addEventListener("input", () => {
+  const searchBook = searchBookElement.value.toLowerCase();
+  console.log(searchBook);
+
+  //Use filter to extract the seachBook from the allBooks array
+  const filteredBooks = allBooks.filter((book) =>
+    book.volumeInfo.title.toLowerCase().includes(searchBook)
+  );
+  if (listInputElement.checked) {
+    displayBookList(filteredBooks);
+  } else {
+    displayBookGrid(filteredBooks);
+  }
+});
 
 // Call the firstRender on page load
 firstRender();
