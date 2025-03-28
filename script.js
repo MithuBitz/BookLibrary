@@ -7,17 +7,17 @@ const listForBooksElement = document.getElementById("book-list-container");
 const bookListUlElement = document.getElementById("book-list-ul");
 
 const sortingDropdownName = document.getElementById("sortOrderName");
-const soriingDropdownDate = document.getElementById("sortOrderDate");
+const sortingDropdownDate = document.getElementById("sortOrderDate");
 
 const searchBookElement = document.getElementById("searchInput");
 
 //Store all books globally in an array
 let allBooks = [];
 
+let pageNumber = 1;
 //Function to get the books from api
-const getFetchData = async () => {
-  const url =
-    "https://api.freeapi.app/api/v1/public/books?page=1&limit=10&inc=kind%252Cid%252Cetag%252CvolumeInfo&query=tech";
+const getFetchData = async (page = 1) => {
+  const url = `https://api.freeapi.app/api/v1/public/books?page=${page}&limit=10&inc=kind%252Cid%252Cetag%252CvolumeInfo&query=tech`;
   const options = { method: "GET", headers: { accept: "application/json" } };
 
   try {
@@ -35,27 +35,44 @@ const getFetchData = async () => {
   }
 };
 
+window.addEventListener("scroll", () => {
+  const scrollTop = document.documentElement.scrollTop;
+  const windowHeight = window.innerHeight;
+  const fullHeight = document.documentElement.offsetHeight;
+
+  // Check if user is within 100px of the bottom
+  if (scrollTop + windowHeight >= fullHeight - 100) {
+    pageNumber += 1;
+    console.log("PageNo: ", pageNumber);
+
+    loadBooks(pageNumber); // Call function to load more books
+  }
+});
+
+const loadBooks = async (page) => {
+  const data = await getFetchData(page);
+  if (data && data.length > 0) {
+    allBooks = [...allBooks, ...data];
+    if (listInputElement.checked) {
+      displayBookList(allBooks);
+    } else {
+      displayBookGrid(allBooks);
+    }
+  } else {
+    console.log("No more books to load");
+  }
+};
+
 const getBookData = async () => {
   try {
     // const bookData = await getFetchData();
-    const data = await getFetchData();
+    const data = await getFetchData(pageNumber);
     // console.log(data.data[0].volumeInfo.title);
     return data;
   } catch (error) {
     throw new Error("Book Data not found", error);
   }
 };
-
-// //When user select grid
-// gridInputElement.addEventListener("click", () => {
-//   if (gridInputElement.checked) {
-//     listInputElement.checked = false;
-//     // console.log("Grid view");
-//     listForBooksElement.classList.add("hide");
-//     gridForBooksElement.classList.remove("hide");
-//     displayBookGrid();
-//   }
-// });
 
 // Function to display a books in List
 const displayBookList = (books) => {
@@ -176,8 +193,8 @@ sortingDropdownName.addEventListener("change", async () => {
   }
 });
 
-soriingDropdownDate.addEventListener("change", async () => {
-  const selectedValue = soriingDropdownDate.value;
+sortingDropdownDate.addEventListener("change", async () => {
+  const selectedValue = sortingDropdownDate.value;
 
   const sortedBooks = sortBooksByDate(allBooks, selectedValue);
   console.log(sortedBooks);
@@ -211,7 +228,7 @@ gridInputElement.addEventListener("click", () => {
 
     // console.log(data);
 
-    displayBookList(allBooks);
+    displayBookGrid(allBooks);
   }
 });
 
@@ -249,6 +266,13 @@ searchBookElement.addEventListener("input", () => {
   const filteredBooks = allBooks.filter((book) =>
     book.volumeInfo.title.toLowerCase().includes(searchBook)
   );
+  // Check if no book found
+  if (filteredBooks.length === 0) {
+    document.getElementById("no-book-found").classList.remove("hide");
+  } else {
+    document.getElementById("no-book-found").classList.add("hide");
+  }
+
   if (listInputElement.checked) {
     displayBookList(filteredBooks);
   } else {
